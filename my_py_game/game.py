@@ -1,4 +1,4 @@
-import pygame, random, os
+import pygame, random, os, time
 
 #Initialize pygame and create clock
 pygame.init()
@@ -19,20 +19,22 @@ GREY = (10,10,10)
 WHITE = (255,255,255)
 RED = (225,50,60)
 DARK_RED = (90,20,60)
+BLUE = (60,110,220)
 
 #Game settings
-VELOCITY = 18
+VELOCITY = 20
 GRAVITY = 9.8
 jump = False
 jump_y = 20
 movement = [False,False]
 top = False
-move_box_velocity = 8
+move_box_velocity = 15
 move_floor = [5,-5]
 
 
 score = 0 
 timer = 3
+highscore = 0
 
 #Obstacles
 box = pygame.Rect(WIDTH//2-20,50,80,80)
@@ -62,15 +64,15 @@ gameover_rect = gameover.get_rect()
 gameover_rect.x = WIDTH//2-170
 gameover_rect.y = HEIGHT//2-50
 
-pressAnyKey = font.render("Press Any Key To Play Again.",True,GREY)
-pressAnyKey_rect = pressAnyKey.get_rect()
-pressAnyKey_rect.x = WIDTH//2-230
-pressAnyKey_rect.y = HEIGHT//2+30
+pressSpacebar = font.render("Press Spacebar To Play Again.",True,GREY)
+pressSpacebar_rect = pressSpacebar.get_rect()
+pressSpacebar_rect.x = WIDTH//2-230
+pressSpacebar_rect.y = HEIGHT//2+30
 
 # Game sounds
-box_out = pygame.mixer.Sound("Music/YOP.wav")
-box_drop = pygame.mixer.Sound("Music/WUP.wav")
-pygame.mixer.music.load("Music/jooz.wav")
+box_out = pygame.mixer.Sound("Music/YOP.mp3")
+box_drop = pygame.mixer.Sound("Music/WUP.mp3")
+pygame.mixer.music.load("Music/jooz.mp3")
 pygame.mixer.music.play(-1)
 pygame.mixer.music.set_volume(0.1)
 
@@ -81,7 +83,10 @@ def paused():
     
     while pause:
         screen.blit(gameover,gameover_rect)
-        screen.blit(pressAnyKey,pressAnyKey_rect)
+        screen.blit(pressSpacebar,pressSpacebar_rect)
+        screen.blit(highScore_text,highScore_rect)
+        pygame.mixer.music.set_volume(0.3)
+        
         pygame.display.update()
 
         for event in pygame.event.get():
@@ -89,7 +94,8 @@ def paused():
                 pygame.quit()
                 
             if event.type == pygame.KEYDOWN:
-                pause = False
+                if event.key == pygame.K_SPACE:
+                    pause = False
 
 #Game loop
 looping = True
@@ -145,9 +151,8 @@ while looping:
 
         # Reset game values
         if timer == 0:
-
-            move_box_velocity = 8
-            VELOCITY = 18
+            move_box_velocity = 15
+            VELOCITY = 20
             move_floor[1] = -5
 
             paused()
@@ -188,6 +193,10 @@ while looping:
     # if box out of screen
     if (box.right < 0 or box.left > WIDTH):
         score += 1
+
+        if score > highscore:
+            highscore = score
+
         box_drop.play()
 
         # rand x integer
@@ -197,8 +206,9 @@ while looping:
         box.y = 0
 
         # Make block, character and floor move faster
-        move_box_velocity += 1
-        VELOCITY += 1
+        # limit = 20
+        # if move_box_velocity < limit: 
+        #     move_box_velocity += 1
 
         # # Randomly disperse floor
         # rand_floor = random.randint(50,1100)
@@ -255,6 +265,12 @@ while looping:
     timer_rect = timer_text.get_rect()
     timer_rect.x = WIDTH-290
     timer_rect.y = 50
+
+    # Highscore
+    highScore_text = font.render("Your Highscore: "+str(highscore),True,DARK_RED)
+    highScore_rect = highScore_text.get_rect()
+    highScore_rect.x = WIDTH//2-300
+    highScore_rect.y = HEIGHT//2+80
 
     #Blit images
     screen.blit(player,player_rect)
