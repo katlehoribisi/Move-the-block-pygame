@@ -144,6 +144,8 @@ while looping:
     if box.colliderect(floor_button):
 
         box_out.play()
+        box_out.set_volume(0.1)
+
         rand = random.randint(50,1100)
         box.x = rand
         box.y = 50
@@ -198,6 +200,8 @@ while looping:
             highscore = score
 
         box_drop.play()
+        box_drop.set_volume(0.1)
+
 
         # rand x integer
         rand_box = random.randint(60,1100)
